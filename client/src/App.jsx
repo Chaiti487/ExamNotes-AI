@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { getCurrentUser } from './services/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate } from "react-router-dom";
-export const serverUrl = "http://localhost:8000"
+export const serverUrl = import.meta.env.VITE_API_URL
 import History from "./pages/History";
 import Pricing from "./pages/Pricing";
 import Notes from "./pages/Notes";
