@@ -25,7 +25,6 @@ function Notes() {
         transition={{ duration: 0.5 }}
         className="mb-10 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 px-8 py-6 shadow-[0_20px_45px_rgba(0,0,0,0.6)] flex md:items-center justify-between gap-4 flex-col md:flex-row"
       >
-        {/* LEFT */}
         <div onClick={() => navigate("/")} className="cursor-pointer">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
             ExamNotes AI
@@ -35,7 +34,6 @@ function Notes() {
           </p>
         </div>
 
-        {/* RIGHT */}
         <div className="flex items-center gap-4 flex-wrap">
           {/* CREDITS */}
           <button
@@ -74,74 +72,51 @@ function Notes() {
         />
       </motion.div>
 
-
+      {/* LOADING */}
       {loading && (
-          <motion.div
-          animate={{opacity:[0.4, 1, 0.4]}}
-          transition={{ repeat:Infinity , duration:1.2}}
-          className="text-center text-black font-medium mb-6">
-            Generating exam-focused notes...
-
-          </motion.div>
+        <motion.div
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.2 }}
+          className="text-center text-black font-medium mb-6"
+        >
+          Generating exam-focused notes...
+        </motion.div>
       )}
 
+      {/* ERROR */}
       {error && (
-        <div className="mb-6 text-center text-red-600 font-medium">
-            {error}
-        </div>
+        <div className="mb-6 text-center text-red-600 font-medium">{error}</div>
       )}
 
-      {!result && <motion.div whileHover={{ scale:1.02}}
-      className="
-      h-64
-      rounded-2xl
-      flex flex-col items-center justify-center
-      bg-white/60 backdrop-blur-lg
-      border border-dashed border-gray-300
-      text-gray-500
-      shadow-inner
-      ">
-        <span className="text-4xl mb-3">📘</span>
-        <p className="text-sm">
-            Generated notes will appear here
-        </p>
-
-      </motion.div>}
-
-      {result && <motion.div
-      initial={{opacity:0 , y:30}}
-        animate={{opacity:1 , y:0}}
-        transition={{duration:0.4}}
-      className='flex flex-col lg:grid lg:grid-cols-4
-      gap-6'>
-
-      <div className='lg:col-span-1'>
-       <Sidebar result = {result}/>
-
-      </div>
-
-      <div className='lg:col-span-3
-      rounded-2xl
-      bg-white
-      shadow-[0_15px_40px_rgba(0,0,0,0.15)]
-      p-6'>
-        <FinalResult result={result}/>
-
-      </div>
-      
-      </motion.div>}
-
-      {/* RESULT */}
-      {loading && (
-        <p className="text-center text-gray-600">Generating notes...</p>
+      {/* EMPTY STATE */}
+      {!result && !loading && (
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="h-64 rounded-2xl flex flex-col items-center justify-center bg-white/60 backdrop-blur-lg border border-dashed border-gray-300 text-gray-500 shadow-inner"
+        >
+          <span className="text-4xl mb-3">📘</span>
+          <p className="text-sm">Generated notes will appear here</p>
+        </motion.div>
       )}
 
-      {error && <p className="text-center text-red-500">{error}</p>}
-
+      {/* RESULT SECTION */}
       {result && (
-        <div className="bg-white p-6 rounded-xl shadow-md whitespace-pre-wrap">
-          {result}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col lg:grid lg:grid-cols-4 gap-6"
+        >
+          {/* SIDEBAR */}
+          <div className="lg:col-span-1">
+            <Sidebar result={result} />
+          </div>
+
+          {/* MAIN RESULT */}
+          <div className="lg:col-span-3 rounded-2xl bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] p-6">
+            <FinalResult result={result} />
+          </div>
+        </motion.div>
       )}
     </div>
   );
