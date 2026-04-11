@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from 'react-markdown'
+import MermaidSetup from "./MermaidSetup";
+import Rechartsetup from "./Rechartsetup";
 
 
 
@@ -107,7 +109,7 @@ function FinalResult({result}) {
           </section>
         )}
 
-        {quickRevision && (
+        {quickRevision && 
           <section className="rounded-xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200 p-6">
             <h3 className="font-bold text-green-700 mb-3 text-lg">
               ⚡Exam Quick Revision Points
@@ -117,8 +119,36 @@ function FinalResult({result}) {
                 <li key={i}>{p}</li>
               ))}
             </ul>
-          </section>
-        )}
+          </section>}
+
+
+          {result.diagram?.data && <section>
+            <SectionHeader icon="📊" title="Diagram" color="cyan" />
+
+            <MermaidSetup diagram={result.diagram?.data} />
+            <p className="mt-3 text-xs text-gray-500 italic">
+              ℹ️ If you need this diagram for future reference or revision,you can save it by taking a screenshot.
+
+            </p>
+
+          </section>}
+
+         {result.charts?.length > 0 &&
+          <section>
+            <SectionHeader icon="📈" title="Visual Charts" color="indigo"/>
+            <Rechartsetup charts={result.charts} />
+             <p className="mt-3 text-xs text-gray-500 italic">
+              ℹ️ If you need these charts for future reference or revision,you can save them by taking a screenshot.
+            </p>
+
+          </section>}
+
+          {result.charts && result.charts.length === 0 && (
+            <p className="text-sm text-gray-400 italic">
+              📉 Charts are not relevant for this topic.
+
+            </p>
+          )}
 
         <section>
           <SectionHeader icon="❓" title="Important Questions" color="rose" />
