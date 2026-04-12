@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from 'react-markdown'
 import MermaidSetup from "./MermaidSetup";
 import Rechartsetup from "./Rechartsetup";
+import { downloadPdf } from "../services/api";
 
 
 
@@ -70,7 +71,8 @@ function FinalResult({result}) {
               {quickRevision ? "Exit Revision Mode" : "Quick Revision (5 min)"}
             </button>
 
-            <button className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700">
+            <button onClick={()=>downloadPdf(result)}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700">
               ⬇️ Download PDF
             </button>
           </div>

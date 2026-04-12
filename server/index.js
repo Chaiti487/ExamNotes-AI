@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import userRouter from "./routes/user.route.js";
 import notesRouter from "./routes/generate.route.js";
+import pdfRouter from "./routes/pdf.route.js";
 
 const app = express()
 app.use(
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/notes", notesRouter)
+app.use("/api/pdf", pdfRouter);
 connect().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
