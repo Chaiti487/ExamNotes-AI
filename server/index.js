@@ -8,15 +8,27 @@ import cors from "cors"
 import userRouter from "./routes/user.route.js";
 import notesRouter from "./routes/generate.route.js";
 import pdfRouter from "./routes/pdf.route.js";
+import creditRouter from "./routes/credits.route.js";
+import Stripe from "stripe";
+import { stripeWebhook } from "./controllers/credits.controller.js";
 
 const app = express()
+
+app.post(
+  "/api/credits/webhook",
+  express.raw({ type:"appliccation/json"}),
+  stripeWebhook
+);
+
 app.use(
   cors({
     origin: ["https://exam-notes-ai-dusky.vercel.app" , "http://localhost:5173"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  }),
-);
+  })
+)
+
+
 app.use(express.json())
 app.use(cookieParser())
 const PORT = process.env.PORT || 5000
@@ -27,6 +39,7 @@ app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/notes", notesRouter)
 app.use("/api/pdf", pdfRouter);
+app.use("/api/credit",creditRouter)
 connect().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

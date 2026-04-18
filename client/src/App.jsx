@@ -10,6 +10,8 @@ export const serverUrl = import.meta.env.VITE_API_URL
 import History from "./pages/History";
 import Pricing from "./pages/Pricing";
 import Notes from "./pages/Notes";
+import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentFailed from './pages/PaymentFailed'
 
 function App() {
   const dispatch = useDispatch()
@@ -43,6 +45,8 @@ function App() {
           path="/notes"
           element={userData ? <Notes /> : <Navigate to="/auth" replace />}
         />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
       </Routes>
     </>
   );

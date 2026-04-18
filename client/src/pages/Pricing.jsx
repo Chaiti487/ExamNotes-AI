@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react"
+import axios from "axios";
+import { serverUrl } from "../App";
+
 
 function Pricing() {
     const navigate = useNavigate()
@@ -11,8 +14,18 @@ function Pricing() {
         try {
             setPayingAmount(amount)
             setPaying(true)
-        } catch (error){
+            const result = await axios.post(serverUrl + "/api/credit/order",{amount},{withCredentials:true})
 
+            if(result.data.url){
+              window.location.href = result.data.url
+            }
+            setPaying(false);
+
+
+
+        } catch (error){
+                setPaying(false);
+                console.log(error)
         }
     }
     return (
@@ -38,7 +51,7 @@ function Pricing() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           <PricingCard
             title="Starter"
-            price="100"
+            price="₹100"
             amount={100}
             credits="50 Credits"
             description="Perfect for quick revision"
@@ -58,7 +71,7 @@ function Pricing() {
           <PricingCard
             popular
             title="Popular"
-            price="200"
+            price="₹200"
             amount={200}
             credits="120 Credits"
             description="Best value for students"
@@ -77,7 +90,7 @@ function Pricing() {
 
           <PricingCard
             title="Pro Learner"
-            price="500"
+            price="₹500"
             amount={500}
             credits="300 Credits"
             description="For serious exam preparation"
