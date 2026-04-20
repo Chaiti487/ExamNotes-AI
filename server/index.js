@@ -14,11 +14,7 @@ import { stripeWebhook } from "./controllers/credits.controller.js";
 
 const app = express()
 
-app.post(
-  "/api/credits/webhook",
-  express.raw({ type:"appliccation/json"}),
-  stripeWebhook
-);
+
 
 app.use(
   cors({
@@ -35,6 +31,11 @@ const PORT = process.env.PORT || 5000
 app.get("/", (req, res) => {
   res.json({ message: "ExamNotes AI Backend Running" })
 })
+app.post(
+  "/api/credits/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook,
+);
 app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/notes", notesRouter)
