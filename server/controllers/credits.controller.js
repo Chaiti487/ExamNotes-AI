@@ -1,6 +1,97 @@
+// import Stripe from "stripe";
+// import UserModel from "../models/usermodel.js";
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// const CREDIT_MAP = {
+//   100: 50,
+//   200: 120,
+//   500: 300,
+// };
+
+// export const createCreditsOrder = async (req, res) => {
+//   try {
+//     const userId = req.userId;
+//     const { amount } = req.body;
+
+//     if (!CREDIT_MAP[amount]) {
+//       return res.status(400).json({
+//         message: "Invalid credit plan",
+//       });
+//     }
+//     const session = await stripe.checkout.sessions.create({
+//       mode: "payment",
+//       payment_method_types: ["card"],
+//       success_url: `${process.env.CLIENT_URL}/payment-success`,
+//       cancel_url: `${process.env.CLIENT_URL}/payment-failed`,
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: "inr",
+//             product_data: {
+//               name: `${CREDIT_MAP[amount]}Credits`,
+//             },
+//             unit_amount: amount * 100,
+//           },
+//           quantity: 1,
+//         },
+//       ],
+//       metadata: {
+//         userId,
+//         credits: CREDIT_MAP[amount],
+//       },
+//     });
+//     res.status(200).json({ url: session.url });
+//   } catch (error) {
+//     res.status(500).json({ message: "Stripe error" });
+//   }
+// };
+
+// export const stripeWebhook = async (req, res) => {
+//   const sig = req.headers["stripe-signature"];
+//   let event;
+
+//   try {
+//     event = stripe.webhooks.constructEvent(
+//       req.body,
+//       sig,
+//       process.env.STRIPE_WEBHOOK_SECRET,
+//     );
+//   } catch (error) {
+//     console.log("❌ Webhook signature error:", error.message);
+//     return res.status(400).send("Webhook Error");
+//   }
+//   if (event.type === "checkout.session.completed") {
+//     const session = event.data.object;
+//     const userId = session.metadata.userId;
+//     const creditsToAdd = Number(session.metadata.credits);
+//     console.log(creditsToAdd);
+//     if (!userId || !creditsToAdd) {
+//       return res.status(400).json({ message: "Invalid metadata" });
+//     }
+//     const user = await UserModel.findByIdAndUpdate(
+//       userId,
+//       {
+//         $inc: { credits: creditsToAdd },
+//         $set: { isCreditAvailable: true },
+//       },
+//       { new: true },
+//     );
+//   }
+//   res.json({ received: true });
+// };
+
+
+
+
+// controllers/credits.controller.js
+
 import Stripe from "stripe";
-import UserModel from "../models/usermodel.js";
 import dotenv from "dotenv";
+import UserModel from "../models/usermodel.js";
 
 dotenv.config();
 
@@ -12,6 +103,9 @@ const CREDIT_MAP = {
   500: 300,
 };
 
+// ==========================================
+// CREATE STRIPE CHECKOUT SESSION
+// ==========================================
 export const createCreditsOrder = async (req, res) => {
   try {
     const userId = req.userId;
@@ -22,64 +116,95 @@ export const createCreditsOrder = async (req, res) => {
         message: "Invalid credit plan",
       });
     }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
+
       success_url: `${process.env.CLIENT_URL}/payment-success`,
       cancel_url: `${process.env.CLIENT_URL}/payment-failed`,
+
       line_items: [
         {
           price_data: {
             currency: "inr",
             product_data: {
-              name: `${CREDIT_MAP[amount]}Credits`,
+              name: `${CREDIT_MAP[amount]} Credits`,
             },
             unit_amount: amount * 100,
           },
           quantity: 1,
         },
       ],
+
       metadata: {
         userId,
         credits: CREDIT_MAP[amount],
       },
     });
-    res.status(200).json({ url: session.url });
+
+    res.status(200).json({
+      url: session.url,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Stripe error" });
+    console.log(error.message);
+
+    res.status(500).json({
+      message: "Stripe session failed",
+    });
   }
 };
 
+// ==========================================
+// STRIPE WEBHOOK
+// ==========================================
 export const stripeWebhook = async (req, res) => {
   const sig = req.headers["stripe-signature"];
+
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET,
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
-    console.log("❌ Webhook signature error:", error.message);
+    console.log("Webhook Signature Error:", error.message);
     return res.status(400).send("Webhook Error");
   }
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const userId = session.metadata.userId;
-    const creditsToAdd = Number(session.metadata.credits);
-    console.log(creditsToAdd);
-    if (!userId || !creditsToAdd) {
-      return res.status(400).json({ message: "Invalid metadata" });
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      const userId = session.metadata.userId;
+      const creditsToAdd = Number(session.metadata.credits);
+
+      if (!userId || !creditsToAdd) {
+        return res.status(400).json({
+          message: "Invalid metadata",
+        });
+      }
+
+      await UserModel.findByIdAndUpdate(
+        userId,
+        {
+          $inc: { credits: creditsToAdd },
+          $set: { isCreditAvailable: true },
+        },
+        { new: true }
+      );
+
+      console.log("Credits Added Successfully");
     }
-    const user = await UserModel.findByIdAndUpdate(
-      userId,
-      {
-        $inc: { credits: creditsToAdd },
-        $set: { isCreditAvailable: true },
-      },
-      { new: true },
-    );
+
+    res.json({ received: true });
+  } catch (error) {
+    console.log(error.message);
+
+    res.status(500).json({
+      message: "Webhook failed",
+    });
   }
-  res.json({ received: true });
 };
