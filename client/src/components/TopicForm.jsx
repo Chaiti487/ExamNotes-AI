@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { updateCredits } from "../redux/userSlice";
 
 
-function TopicForm({ setResult, setLoading, loading, setError }) {
+function TopicForm({ setResult, setLoading, loading, setError, setNoteId }) {
   const [topic, setTopic] = useState("");
   const [classLevel, setClassLevel] = useState("");
   const [examType, setExamType] = useState("");
@@ -25,6 +25,7 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
     setError("");
     setLoading(true);
     setResult(null);
+    setNoteId(null);
 
     try {
       const result = await generateNotes({
@@ -36,16 +37,16 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
         includeChart,
       });
 
+      setNoteId(result.notesId);
       setResult(result.data);
       setClassLevel("");
       setExamType("");
-    setRevisionMode(false);
-    setIncludeDiagram(false);
-    setIncludeChart(false);
-    if(typeof result.creditsLeft === "number"){
-        dispatch(updateCredits(result.creditsLeft))
-    }
-
+      setRevisionMode(false);
+      setIncludeDiagram(false);
+      setIncludeChart(false);
+      if (typeof result.creditsLeft === "number") {
+        dispatch(updateCredits(result.creditsLeft));
+      }
     } catch (error) {
       console.log(error);
       setError("Failed to fetch notes from server");
@@ -53,40 +54,32 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
-  if(!loading) {
-    setProgress(0);
-    setProgressText("");
-    return;
+    if (!loading) {
+      setProgress(0);
+      setProgressText("");
+      return;
     }
     let value = 0;
     const interval = setInterval(() => {
-      value += Math.random() * 8
-      if(value >= 95) {
+      value += Math.random() * 8;
+      if (value >= 95) {
         value = 95;
         setProgressText("Almost done...");
         clearInterval(interval);
-      }else if(value > 70){
+      } else if (value > 70) {
         setProgressText("Finalizing notes...");
-        }else if(value > 40){
-            setProgressText("Processing content...");
-            }else {
-                setProgressText("Generating notes...");
+      } else if (value > 40) {
+        setProgressText("Processing content...");
+      } else {
+        setProgressText("Generating notes...");
+      }
 
-            }
-
-        setProgress(Math.floor(value))
-      
-    },700);
+      setProgress(Math.floor(value));
+    }, 700);
     return () => clearInterval(interval);
-
-  },[loading])
-
-
-
-
-
+  }, [loading]);
 
   return (
     <motion.div

@@ -15,6 +15,7 @@ function Notes() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [noteId, setNoteId] = useState(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-8">
@@ -69,6 +70,7 @@ function Notes() {
           setLoading={setLoading}
           loading={loading}
           setError={setError}
+          setNoteId={setNoteId}
         />
       </motion.div>
 
@@ -114,7 +116,7 @@ function Notes() {
 
           {/* MAIN RESULT */}
           <div className="lg:col-span-3 rounded-2xl bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] p-6">
-            <FinalResult result={result} />
+            <FinalResult key={noteId} result={result} noteId={noteId} />
           </div>
         </motion.div>
       )}
