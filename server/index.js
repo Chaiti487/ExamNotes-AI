@@ -12,6 +12,7 @@ import creditRouter from "./routes/credits.route.js";
 import Stripe from "stripe";
 import { stripeWebhook } from "./controllers/credits.controller.js";
 import flashcardRouter from "./routes/flashcard.route.js";
+import quizRouter from "./routes/quiz.route.js";
 
 
 
@@ -46,6 +47,7 @@ app.use("/api/notes", notesRouter)
 app.use("/api/pdf", pdfRouter);
 app.use("/api/credit",creditRouter)
 app.use("/api/flashcards", flashcardRouter);
+app.use("/api/quiz", quizRouter);
 
 connect().then(() => {
   app.listen(PORT, () => {

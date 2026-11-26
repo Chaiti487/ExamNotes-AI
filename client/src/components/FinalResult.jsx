@@ -4,6 +4,9 @@ import MermaidSetup from "./MermaidSetup";
 import Rechartsetup from "./Rechartsetup";
 import { downloadPdf } from "../services/api";
 import Flashcards from "./Flashcards";
+import Quiz from "./Quiz";
+
+// Markdown Styling
 
 const markDownComponent = {
   h1: ({ children }) => (
@@ -37,7 +40,10 @@ const markDownComponent = {
 
 function FinalResult({ result, noteId }) {
   const [quickRevision, setQuickRevision] = useState(false);
+
   const [activeTab, setActiveTab] = useState("notes");
+
+  // Validate generated notes
 
   if (
     !result ||
@@ -52,84 +58,103 @@ function FinalResult({ result, noteId }) {
 
   return (
     <div className="mt-6 p-3 space-y-10 bg-white">
-      {/* STUDY MODE TABS */}
+      {/* ================= STUDY MODE TABS ================= */}
+
       <div className="flex flex-wrap gap-3 border-b border-gray-200 pb-4">
         <button
           onClick={() => setActiveTab("notes")}
-          className={`px-5 py-3 rounded-xl font-medium
-                        transition-all ${
-                          activeTab === "notes"
-                            ? "bg-indigo-600 text-white shadow-md"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        }`}
+          className={`px-5 py-3 rounded-xl font-medium transition-all ${
+            activeTab === "notes"
+              ? "bg-indigo-600 text-white shadow-md"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
         >
           📘 Study Notes
         </button>
 
         {noteId && (
-          <button
-            onClick={() => setActiveTab("flashcards")}
-            className={`px-5 py-3 rounded-xl font-medium
-                            transition-all ${
-                              activeTab === "flashcards"
-                                ? "bg-indigo-600 text-white shadow-md"
-                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                            }`}
-          >
-            🗂️ AI Flashcards
-          </button>
+          <>
+            <button
+              onClick={() => setActiveTab("flashcards")}
+              className={`px-5 py-3 rounded-xl font-medium transition-all ${
+                activeTab === "flashcards"
+                  ? "bg-indigo-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              🗂️ AI Flashcards
+            </button>
+
+            <button
+              onClick={() => setActiveTab("quiz")}
+              className={`px-5 py-3 rounded-xl font-medium transition-all ${
+                activeTab === "quiz"
+                  ? "bg-indigo-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              🧠 AI Quiz
+            </button>
+          </>
         )}
       </div>
 
-      {/* FLASHCARD SECTION */}
+      {/* ================= FLASHCARDS SECTION ================= */}
+
       {noteId && (
         <div className={activeTab === "flashcards" ? "block" : "hidden"}>
           <Flashcards key={noteId} noteId={noteId} />
         </div>
       )}
 
-      {/* NOTES SECTION */}
+      {/* ================= QUIZ SECTION ================= */}
+
+      {noteId && (
+        <div className={activeTab === "quiz" ? "block" : "hidden"}>
+          <Quiz key={noteId} noteId={noteId} />
+        </div>
+      )}
+
+      {/* ================= STUDY NOTES SECTION ================= */}
+
       {activeTab === "notes" && (
         <div className="space-y-10">
-          {/* GENERATED NOTES HEADER */}
+          {/* Header */}
+
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2
-              className="text-3xl font-bold
-                                bg-gradient-to-r from-indigo-600 to-purple-600
-                                bg-clip-text text-transparent"
-            >
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               📘 Generated Notes
             </h2>
 
             <div className="flex flex-wrap gap-3">
-              {/* QUICK REVISION BUTTON */}
+              {/* Quick Revision Button */}
+
               <button
                 onClick={() => setQuickRevision(!quickRevision)}
-                className={`px-4 py-2 rounded-lg
-                                    text-sm font-medium transition ${
-                                      quickRevision
-                                        ? "bg-green-600 text-white"
-                                        : "bg-green-100 text-green-700 hover:bg-green-200"
-                                    }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  quickRevision
+                    ? "bg-green-600 text-white"
+                    : "bg-green-100 text-green-700 hover:bg-green-200"
+                }`}
               >
                 {quickRevision
                   ? "Exit Revision Mode"
                   : "Quick Revision (5 min)"}
               </button>
 
-              {/* PDF DOWNLOAD BUTTON */}
+              {/* Download PDF Button */}
+
               <button
                 onClick={() => downloadPdf(result)}
-                className="px-4 py-2 rounded-lg text-sm
-                                    font-medium bg-indigo-600 text-white
-                                    hover:bg-indigo-700"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700"
               >
                 ⬇️ Download PDF
               </button>
             </div>
           </div>
 
-          {/* SUB TOPICS */}
+          {/* ================= SUB TOPICS ================= */}
+
           {!quickRevision && (
             <section>
               <SectionHeader icon="⭐" title="Sub Topics" color="indigo" />
@@ -141,8 +166,8 @@ function FinalResult({ result, noteId }) {
                   </p>
 
                   <ul className="list-disc ml-6 text-gray-700">
-                    {topics.map((t, i) => (
-                      <li key={i}>{t}</li>
+                    {topics.map((topic, index) => (
+                      <li key={index}>{topic}</li>
                     ))}
                   </ul>
                 </div>
@@ -150,7 +175,8 @@ function FinalResult({ result, noteId }) {
             </section>
           )}
 
-          {/* DETAILED NOTES */}
+          {/* ================= DETAILED NOTES ================= */}
+
           {!quickRevision && (
             <section>
               <SectionHeader icon="📝" title="Detailed Notes" color="purple" />
@@ -163,26 +189,24 @@ function FinalResult({ result, noteId }) {
             </section>
           )}
 
-          {/* QUICK REVISION POINTS */}
+          {/* ================= QUICK REVISION ================= */}
+
           {quickRevision && (
-            <section
-              className="rounded-xl bg-gradient-to-r
-                                from-green-100 to-green-50
-                                border border-green-200 p-6"
-            >
+            <section className="rounded-xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200 p-6">
               <h3 className="font-bold text-green-700 mb-3 text-lg">
                 ⚡ Exam Quick Revision Points
               </h3>
 
               <ul className="list-disc ml-6 space-y-2 text-gray-700">
-                {result.revisionPoints.map((p, i) => (
-                  <li key={i}>{p}</li>
+                {result.revisionPoints.map((point, index) => (
+                  <li key={index}>{point}</li>
                 ))}
               </ul>
             </section>
           )}
 
-          {/* DIAGRAM */}
+          {/* ================= DIAGRAM SECTION ================= */}
+
           {result.diagram?.data && (
             <section>
               <SectionHeader icon="📊" title="Diagram" color="cyan" />
@@ -196,7 +220,8 @@ function FinalResult({ result, noteId }) {
             </section>
           )}
 
-          {/* VISUAL CHARTS */}
+          {/* ================= CHART SECTION ================= */}
+
           {result.charts?.length > 0 && (
             <section>
               <SectionHeader icon="📈" title="Visual Charts" color="indigo" />
@@ -210,43 +235,50 @@ function FinalResult({ result, noteId }) {
             </section>
           )}
 
-          {/* NO CHARTS AVAILABLE */}
+          {/* No Charts Available */}
+
           {result.charts && result.charts.length === 0 && (
             <p className="text-sm text-gray-400 italic">
               📉 Charts are not relevant for this topic.
             </p>
           )}
 
-          {/* IMPORTANT QUESTIONS */}
+          {/* ================= IMPORTANT QUESTIONS ================= */}
+
           <section>
             <SectionHeader icon="❓" title="Important Questions" color="rose" />
 
-            {/* SHORT QUESTIONS */}
+            {/* Short Questions */}
+
             <p className="font-medium">Short Questions:</p>
 
             <ul className="list-disc ml-6 text-gray-700">
-              {result.questions.short.map((q, i) => (
-                <li key={i}>{q}</li>
+              {result.questions.short.map((question, index) => (
+                <li key={index}>{question}</li>
               ))}
             </ul>
 
-            {/* LONG QUESTIONS */}
+            {/* Long Questions */}
+
             <p className="font-medium mt-4">Long Questions:</p>
 
             <ul className="list-disc ml-6 text-gray-700">
-              {result.questions.long.map((q, i) => (
-                <li key={i}>{q}</li>
+              {result.questions.long.map((question, index) => (
+                <li key={index}>{question}</li>
               ))}
             </ul>
 
-            {/* DIAGRAM QUESTIONS */}
+            {/* Diagram Questions */}
+
             {result.questions.diagram && (
               <>
                 <p className="font-medium mt-4">Diagram Questions:</p>
 
                 <ul className="list-disc ml-6 text-gray-700">
                   {Array.isArray(result.questions.diagram) ? (
-                    result.questions.diagram.map((q, i) => <li key={i}>{q}</li>)
+                    result.questions.diagram.map((question, index) => (
+                      <li key={index}>{question}</li>
+                    ))
                   ) : (
                     <li>{result.questions.diagram}</li>
                   )}
@@ -260,24 +292,29 @@ function FinalResult({ result, noteId }) {
   );
 }
 
-// REUSABLE SECTION HEADER
+// ================= REUSABLE SECTION HEADER =================
+
 function SectionHeader({ icon, title, color }) {
   const colors = {
     indigo: "from-indigo-100 to-indigo-50 text-indigo-700",
+
     purple: "from-purple-100 to-purple-50 text-purple-700",
+
     blue: "from-blue-100 to-blue-50 text-blue-700",
+
     green: "from-green-100 to-green-50 text-green-700",
+
     cyan: "from-cyan-100 to-cyan-50 text-cyan-700",
+
     rose: "from-rose-100 to-rose-50 text-rose-700",
   };
 
   return (
     <div
-      className={`mb-4 px-4 py-2 rounded-lg
-                bg-gradient-to-r ${colors[color]}
-                font-semibold flex items-center gap-2`}
+      className={`mb-4 px-4 py-2 rounded-lg bg-gradient-to-r ${colors[color]} font-semibold flex items-center gap-2`}
     >
       <span>{icon}</span>
+
       <span>{title}</span>
     </div>
   );

@@ -87,3 +87,72 @@ export const getFlashcards = async (noteId) => {
     throw error;
   }
 };
+
+// Generate or retrieve existing quiz
+export const generateQuiz = async (noteId) => {
+    try {
+        const response = await axios.post(
+            `${serverUrl}/api/quiz/generate/${noteId}`,
+            {},
+            { withCredentials: true }
+        );
+
+        return response.data;
+
+    } catch (error) {
+        console.error("Quiz generation failed:", error);
+        throw error;
+    }
+};
+
+
+// Retrieve existing quiz
+export const getQuiz = async (noteId) => {
+    try {
+        const response = await axios.get(
+            `${serverUrl}/api/quiz/${noteId}`,
+            { withCredentials: true }
+        );
+
+        return response.data;
+
+    } catch (error) {
+        console.error("Quiz retrieval failed:", error);
+        throw error;
+    }
+};
+
+
+// Submit quiz answers
+export const submitQuiz = async (quizId, answers) => {
+    try {
+        const response = await axios.post(
+            `${serverUrl}/api/quiz/submit/${quizId}`,
+            { answers },
+            { withCredentials: true }
+        );
+
+        return response.data;
+
+    } catch (error) {
+        console.error("Quiz submission failed:", error);
+        throw error;
+    }
+};
+
+
+// Retrieve quiz attempt history
+export const getQuizAttempts = async (quizId) => {
+    try {
+        const response = await axios.get(
+            `${serverUrl}/api/quiz/attempts/${quizId}`,
+            { withCredentials: true }
+        );
+
+        return response.data;
+
+    } catch (error) {
+        console.error("Quiz history retrieval failed:", error);
+        throw error;
+    }
+};
