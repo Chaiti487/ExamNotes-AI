@@ -19,7 +19,7 @@ export const generateNotes = async (req, res) => {
     }
 
     // 🔥 TEMP FIX (no auth)
-    const user = await UserModel.findOne(); // take any user
+    const user = await UserModel.findById(req.userId); // take any user
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
