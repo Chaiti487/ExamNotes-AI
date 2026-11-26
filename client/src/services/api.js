@@ -19,12 +19,16 @@ export const generateNotes = async (payload) => {
     const result = await axios.post(
       serverUrl + "/api/notes/generate-notes",
       payload,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
+
     console.log(result.data);
     return result.data;
   } catch (error) {
-    console.log(error);
+    console.error("Notes generation failed:", error);
+    throw error;
   }
 };
 
@@ -51,5 +55,35 @@ export const downloadPdf = async (result) => {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     throw new Error("PDF download failed");
+  }
+};
+
+export const generateFlashcards = async (noteId) => {
+  try {
+    const response = await axios.post(
+      serverUrl + `/api/flashcards/generate/${noteId}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Flashcard generation failed:", error);
+    throw error;
+  }
+};
+
+export const getFlashcards = async (noteId) => {
+  try {
+    const response = await axios.get(serverUrl + `/api/flashcards/${noteId}`, {
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Flashcard retrieval failed:", error);
+    throw error;
   }
 };
